@@ -30,8 +30,8 @@ th {
   background: #333;
 }
 </style>
-
 </head>
+
 <body>
 
 <h1>📷 Face Scan Dashboard</h1>
@@ -42,12 +42,15 @@ th {
 <th>เวลา</th>
 <th>ชื่อ</th>
 <th>Score</th>
+<th>วันที่</th>
 </tr>
 </thead>
+
 <tbody id="logTable"></tbody>
 </table>
 
 <script>
+
 const firebaseConfig = {
   apiKey: "AIzaSyC_HoCxNTNkT0lwLnhFo2XhhL9ZsaJyJsE",
   authDomain: "face-c21b8.firebaseapp.com",
@@ -62,7 +65,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-db.ref("logs").limitToLast(50).on("child_added", snap => {
+db.ref("scan_logs").limitToLast(100).on("child_added", snap => {
+
   const data = snap.val();
 
   const tr = document.createElement("tr");
@@ -70,11 +74,14 @@ db.ref("logs").limitToLast(50).on("child_added", snap => {
   tr.innerHTML = `
     <td>${data.time}</td>
     <td>${data.name}</td>
-    <td>${data.score}</td>
+    <td>${data.score?.toFixed(2)}</td>
+    <td>${data.date}</td>
   `;
 
   document.getElementById("logTable").prepend(tr);
+
 });
+
 </script>
 
 </body>
