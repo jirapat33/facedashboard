@@ -6,6 +6,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <style>
 body {
@@ -29,12 +30,32 @@ td, th {
 th {
   background: #333;
 }
+
+input, button {
+  padding: 8px;
+  font-size: 16px;
+}
 </style>
 </head>
 
 <body>
 
+<!-- ✅ LOGIN BOX -->
+<div id="loginBox">
+  <h2>🔐 Login Dashboard</h2>
+  <input id="email" placeholder="email"><br><br>
+  <input id="password" type="password" placeholder="password"><br><br>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- ✅ DASHBOARD -->
+<div id="dashboard" style="display:none;">
+
 <h1>📷 Face Scan Dashboard</h1>
+
+<button onclick="logout()">Logout</button>
+
+<br><br>
 
 <table>
 <thead>
@@ -49,6 +70,8 @@ th {
 <tbody id="logTable"></tbody>
 </table>
 
+</div>
+
 <script>
 
 const firebaseConfig = {
@@ -58,29 +81,68 @@ const firebaseConfig = {
   projectId: "face-c21b8",
   storageBucket: "face-c21b8.firebasestorage.app",
   messagingSenderId: "757987663456",
-  appId: "1:757987663456:web:a098ca97ba7f45bb826d05",
-  measurementId: "G-9VQT7LYXVT"
+  appId: "1:757987663456:web:a098ca97ba7f45bb826d05"
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.database();
+const auth = firebase.auth();
 
-db.ref("scan_logs").limitToLast(100).on("child_added", snap => {
 
-  const data = snap.val();
+// ---------------------
+// LOGIN
+// ---------------------
+function login(){
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-  const tr = document.createElement("tr");
+  auth.signInWithEmailAndPassword(email, pass)
+    .catch(e=>alert(e.message));
+}
 
-  tr.innerHTML = `
-    <td>${data.time}</td>
-    <td>${data.name}</td>
-    <td>${data.score?.toFixed(2)}</td>
-    <td>${data.date}</td>
-  `;
+function logout(){
+  auth.signOut();
+}
 
-  document.getElementById("logTable").prepend(tr);
-
+// ---------------------
+// AUTH STATE
+// ---------------------
+auth.onAuthStateChanged(user=>{
+  if(user){
+    loginBox.style.display="none";
+    dashboard.style.display="block";
+    startRealtime();
+  } else {
+    loginBox.style.display="block";
+    dashboard.style.display="none";
+  }
 });
+
+
+// ---------------------
+// REALTIME LOAD
+// ---------------------
+function startRealtime(){
+
+  db.ref("scan_logs")
+    .limitToLast(100)
+    .on("child_added", snap => {
+
+      const data = snap.val();
+
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${data.time}</td>
+        <td>${data.name}</td>
+        <td>${data.score?.toFixed(2)}</td>
+        <td>${data.date}</td>
+      `;
+
+      document.getElementById("logTable").prepend(tr);
+  });
+}
 
 </script>
 
