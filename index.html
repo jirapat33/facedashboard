@@ -1,78 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Face Scan Dashboard</title>
 
+<link rel="stylesheet" href="styles.css">
+<link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-<style>
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #111;
-  color: white;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-  background: #222;
-}
-
-td, th {
-  border: 1px solid #444;
-  padding: 8px;
-}
-
-th {
-  background: #333;
-}
-
-input, button {
-  padding: 8px;
-  font-size: 16px;
-}
-</style>
 </head>
-
 <body>
+<!-- ===== LOGO SECTION ===== -->
 
-<!-- ✅ LOGIN BOX -->
-<div id="loginBox">
-  <h2>🔐 Login Dashboard</h2>
-  <input id="email" placeholder="email"><br><br>
-  <input id="password" type="password" placeholder="password"><br><br>
-  <button onclick="login()">Login</button>
+
+
+</div> 
+<div class="l-form">
+    <div class="shape1"></div>
+    <div class="shape2"></div>
+    <div class="logo-container">
+    <img src="C:\Project_FaceDectection\logo1.png" class="logo">
+    <img src="C:\Project_FaceDectection\logo2.png" class="logo">
+    <img src="C:\Project_FaceDectection\logo3.png" class="logo">
 </div>
 
-<!-- ✅ DASHBOARD -->
-<div id="dashboard" style="display:none;">
+    <div class="form">
+        <img src="C:\Project_FaceDectection\me\Beby.jpg" alt="" class="form__img">
 
-<h1>📷 Face Scan Dashboard</h1>
+        <form class="form__content" onsubmit="event.preventDefault(); login();">
+            <h1>📷 Face Scan Dashboard</h1>
+            <h2 class="form__title">Welcome!</h2>
 
-<button onclick="logout()">Logout</button>
+            <!-- EMAIL -->
+            <div class="form__div">
+                <div class="form__icon">
+                    <i class='bx bx-user-circle'></i>
+                </div>
+                <div class="form__div-input">
+                    <label class="form__label">Email</label>
+                    <input type="text" id="email" class="form__input" required>
+                </div>
+            </div>
 
-<br><br>
+            <!-- PASSWORD -->
+            <div class="form__div">
+                <div class="form__icon">
+                    <i class='bx bx-lock'></i>
+                </div>
+                <div class="form__div-input">
+                    <label class="form__label">Password</label>
+                    <input type="password" id="password" class="form__input" required>
+                </div>
+            </div>
 
-<table>
-<thead>
-<tr>
-<th>เวลา</th>
-<th>ชื่อ</th>
-<th>Score</th>
-<th>วันที่</th>
-</tr>
-</thead>
-
-<tbody id="logTable"></tbody>
-</table>
-
+            <input type="submit" class="form__button" value="Login">
+        </form>
+    </div>
 </div>
 
 <script>
+
+/* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_HoCxNTNkT0lwLnhFo2XhhL9ZsaJyJsE",
@@ -85,63 +76,20 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
-const db = firebase.database();
 const auth = firebase.auth();
 
+/* ================= LOGIN FUNCTION ================= */
 
-// ---------------------
-// LOGIN
-// ---------------------
 function login(){
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-  auth.signInWithEmailAndPassword(email, pass)
-    .catch(e=>alert(e.message));
-}
-
-function logout(){
-  auth.signOut();
-}
-
-// ---------------------
-// AUTH STATE
-// ---------------------
-auth.onAuthStateChanged(user=>{
-  if(user){
-    loginBox.style.display="none";
-    dashboard.style.display="block";
-    startRealtime();
-  } else {
-    loginBox.style.display="block";
-    dashboard.style.display="none";
-  }
-});
-
-
-// ---------------------
-// REALTIME LOAD
-// ---------------------
-function startRealtime(){
-
-  db.ref("scan_logs")
-    .limitToLast(100)
-    .on("child_added", snap => {
-
-      const data = snap.val();
-
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${data.time}</td>
-        <td>${data.name}</td>
-        <td>${data.score?.toFixed(2)}</td>
-        <td>${data.date}</td>
-      `;
-
-      document.getElementById("logTable").prepend(tr);
-  });
+    auth.signInWithEmailAndPassword(email, pass)
+    .then(()=>{
+        alert("Login สำเร็จ ✅");
+        window.location.href = "dashboard.html"; 
+    })
+    .catch(e => alert(e.message));
 }
 
 </script>
